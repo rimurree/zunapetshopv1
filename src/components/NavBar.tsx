@@ -55,8 +55,8 @@ function NavBar() {
             className="h-12 w-12 object-contain"
           />
           <div className="hidden sm:block">
-            <p className="text-lg font-semibold text-foreground">
-              Zuna Pet Essentials
+            <p className="font-brand text-lg font-semibold text-foreground">
+              ZPE
             </p>
           </div>
         </Link>
