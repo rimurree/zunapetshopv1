@@ -22,22 +22,6 @@ export type Product = {
   inStock: boolean
 }
 
-const svgCard = (label: string, accent: string, bg: string) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
-  <defs>
-    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="${bg}" />
-      <stop offset="100%" stop-color="${accent}" />
-    </linearGradient>
-  </defs>
-  <rect width="320" height="240" rx="28" fill="url(#g)" />
-  <circle cx="80" cy="80" r="36" fill="rgba(255,255,255,0.6)" />
-  <circle cx="240" cy="160" r="44" fill="rgba(255,255,255,0.5)" />
-  <text x="24" y="206" font-family="'Plus Jakarta Sans', sans-serif" font-size="22" font-weight="700" fill="#3f2d1d">${label}</text>
-</svg>`
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
-}
-
 export const products: Product[] = [
   {
     id: 'zuna-bone-chew',
