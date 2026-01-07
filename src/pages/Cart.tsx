@@ -48,10 +48,9 @@ function Cart() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-semibold text-foreground">Shopping cart</h1>
-        <p className="text-sm text-muted-foreground">
-          Review your selections and adjust quantities anytime.
-        </p>
+        <h1 className="text-3xl font-semibold text-foreground">
+          Shopping cart
+        </h1>
       </div>
 
       {cartItems.length === 0 ? (
@@ -59,7 +58,10 @@ function Cart() {
           <p className="text-sm text-amber-900">
             Your cart is empty. Explore essentials to get started.
           </p>
-          <Link to="/products" className={cn(buttonVariants(), 'mt-4 inline-flex')}>
+          <Link
+            to="/products"
+            className={cn(buttonVariants(), 'mt-4 inline-flex')}
+          >
             Browse products
           </Link>
         </div>
@@ -180,4 +182,3 @@ function Cart() {
 }
 
 export default Cart
-

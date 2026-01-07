@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { categories } from '@/data/categories'
 import { products } from '@/data/products'
@@ -12,6 +12,7 @@ function Products() {
   const activeCategory = params.get('category')
   const query = params.get('query') ?? ''
   const [isLoading, setIsLoading] = useState(true)
+  const previousFilters = useRef({ category: activeCategory, query })
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -32,10 +33,20 @@ function Products() {
   }
 
   useEffect(() => {
+    const previous = previousFilters.current
+    const categoryChanged = previous.category !== activeCategory
+    const queryChanged = previous.query !== query
+    previousFilters.current = { category: activeCategory, query }
+
+    if (categoryChanged && !queryChanged) {
+      setIsLoading(false)
+      return
+    }
+
     setIsLoading(true)
     const timer = window.setTimeout(() => {
       setIsLoading(false)
-    }, 2000)
+    }, 1000)
     return () => window.clearTimeout(timer)
   }, [activeCategory, query])
 
@@ -85,6 +96,16 @@ function Products() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button
+            variant={activeCategory ? 'outline' : 'default'}
+            onClick={() => {
+              const next = new URLSearchParams(params)
+              next.delete('category')
+              updateParams(next)
+            }}
+          >
+            All
+          </Button>
           {categories.map((category) => (
             <Button
               key={category.id}

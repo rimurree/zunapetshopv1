@@ -17,7 +17,7 @@ function ProductCard({ product }: { product: Product }) {
         <img
           src={product.image}
           alt={product.name}
-          className="h-44 w-full object-cover"
+          className="h-44 w-full object-cover object-[70%_70%]"
         />
         <Badge variant="accent" className="absolute left-4 top-4">
           {product.tags[0]}
@@ -25,14 +25,14 @@ function ProductCard({ product }: { product: Product }) {
       </div>
       <CardContent className="flex flex-1 flex-col gap-2">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-foreground">
             {product.name}
           </h3>
-          <p className="text-sm text-slate-600">{product.description}</p>
+          <p className="text-sm text-muted-foreground">{product.description}</p>
         </div>
         <RatingStars rating={product.rating} />
         <div className="flex items-center justify-between gap-2">
-          <p className="whitespace-nowrap text-sm font-semibold text-slate-900">
+          <p className="whitespace-nowrap text-sm font-semibold text-foreground">
             ₱ {product.price.toFixed(2)}
           </p>
           <div className="flex items-center gap-1">

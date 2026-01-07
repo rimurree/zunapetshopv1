@@ -22,7 +22,7 @@ function RouteLoader({ children }: RouteLoaderProps) {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setIsRouteLoading(false)
-    }, 2000)
+    }, 1000)
     return () => window.clearTimeout(timer)
   }, [])
 

@@ -24,8 +24,6 @@ type SearchCommandProps = {
   className?: string
 }
 
-const popularQueries = ['Puppy starter kit', 'Chew toys', 'Travel essentials']
-
 const buildSuggestions = (): Suggestion[] => {
   const productSuggestions = products.map((product) => ({
     label: product.name,
@@ -37,13 +35,8 @@ const buildSuggestions = (): Suggestion[] => {
     type: 'category' as const,
     value: category.id,
   }))
-  const querySuggestions = popularQueries.map((query) => ({
-    label: query,
-    type: 'query' as const,
-    value: query,
-  }))
 
-  return [...querySuggestions, ...categorySuggestions, ...productSuggestions]
+  return [...productSuggestions, ...categorySuggestions]
 }
 
 function SearchCommand({ className }: SearchCommandProps) {
@@ -86,11 +79,27 @@ function SearchCommand({ className }: SearchCommandProps) {
   const suggestions = useMemo(() => buildSuggestions(), [])
 
   const filteredSuggestions = useMemo(() => {
-    if (!query.trim()) {
-      return suggestions
+    const normalizedQuery = query.toLowerCase()
+    const priority: Record<Suggestion['type'], number> = {
+      product: 0,
+      category: 1,
+      query: 2,
     }
-    return suggestions.filter((item) =>
-      item.label.toLowerCase().includes(query.toLowerCase())
+    const matches = query.trim()
+      ? suggestions.filter((item) =>
+          item.label.toLowerCase().includes(normalizedQuery)
+        )
+      : suggestions
+
+    const products = matches
+      .filter((item) => item.type === 'product')
+      .slice(0, 3)
+    const categories = matches
+      .filter((item) => item.type === 'category')
+      .slice(0, 3)
+
+    return [...products, ...categories].sort(
+      (a, b) => priority[a.type] - priority[b.type]
     )
   }, [query, suggestions])
 
@@ -112,7 +121,7 @@ function SearchCommand({ className }: SearchCommandProps) {
       })
     }
     setOpen(false)
-    setQuery('')
+    setQuery(item.label)
   }
 
   const handleRemoveHistory = (entry: string) => {
@@ -209,7 +218,7 @@ function SearchCommand({ className }: SearchCommandProps) {
             ) : null}
             <CommandGroup
               heading="Suggestions"
-              className="pt-2 pb-2 [&_[cmdk-group-heading]]:pb-1"
+              className="pt-2 pb-2 **:[[cmdk-group-heading]]:pb-1"
             >
               {filteredSuggestions.slice(0, 8).map((item) => (
                 <CommandItem

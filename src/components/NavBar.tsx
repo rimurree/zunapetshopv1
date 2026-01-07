@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink, Link, useLocation } from 'react-router-dom'
 import { Moon, ShoppingCart, Sun } from 'lucide-react'
 import { useCart } from '@/context/useCart'
 import SearchCommand from '@/components/SearchCommand'
@@ -29,6 +29,8 @@ const getInitialTheme = (): 'light' | 'dark' => {
 function NavBar() {
   const { itemCount } = useCart()
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme)
+  const location = useLocation()
+  const searchResetKey = location.pathname === '/' ? 'home' : 'other'
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -78,7 +80,7 @@ function NavBar() {
         </nav>
         <div className="flex flex-1 justify-center">
           <div className="hidden w-full max-w-3xl lg:block">
-            <SearchCommand />
+            <SearchCommand key={searchResetKey} />
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -113,7 +115,7 @@ function NavBar() {
         </div>
       </div>
       <div className="px-4 pb-4 lg:hidden">
-        <SearchCommand />
+        <SearchCommand key={`${searchResetKey}-mobile`} />
         <div className="mt-3 flex flex-wrap gap-2">
           {navLinks.map((link) => (
             <NavLink

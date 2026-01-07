@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BadgeCheck, Truck } from 'lucide-react'
 import {
   AlertDialog,
@@ -17,7 +17,13 @@ import { products } from '@/data/products'
 import { useCart } from '@/context/useCart'
 
 function Checkout() {
-  const { items, selectedIds, selectedSubtotal, selectedItemCount } = useCart()
+  const {
+    items,
+    selectedIds,
+    selectedSubtotal,
+    selectedItemCount,
+    clearSelected,
+  } = useCart()
   const initialFormValues = {
     firstName: '',
     lastName: '',
@@ -26,10 +32,27 @@ function Checkout() {
     address: '',
     city: '',
     postalCode: '',
+    productNotes: '',
   }
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [isPlaceDialogOpen, setIsPlaceDialogOpen] = useState(false)
-  const [formValues, setFormValues] = useState(initialFormValues)
+  const [formValues, setFormValues] = useState(() => {
+    if (typeof window === 'undefined') {
+      return initialFormValues
+    }
+    const stored = window.sessionStorage.getItem('zuna-checkout-form')
+    if (!stored) {
+      return initialFormValues
+    }
+    try {
+      return {
+        ...initialFormValues,
+        ...(JSON.parse(stored) as typeof initialFormValues),
+      }
+    } catch {
+      return initialFormValues
+    }
+  })
   const cartItems = items
     .map((item) => ({
       ...item,
@@ -38,10 +61,45 @@ function Checkout() {
     .filter((item) => item.product && selectedIds.includes(item.productId))
 
   const hasSelection = selectedItemCount > 0
-  const isFormComplete = Object.values(formValues).every((value) => value.trim())
+  const requiredFields = { ...formValues, productNotes: 'optional' }
+  const isFormComplete = Object.entries(requiredFields).every(([key, value]) =>
+    key === 'productNotes' ? true : value.trim().length > 0
+  )
   const shipping = hasSelection ? 120 : 0
   const tax = hasSelection ? selectedSubtotal * 0.12 : 0
   const total = selectedSubtotal + shipping + tax
+  const handleFieldChange = (field: keyof typeof initialFormValues) => {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (orderPlaced) {
+        setOrderPlaced(false)
+      }
+      const nextValue = event.target.value
+      setFormValues((current) => ({
+        ...current,
+        [field]: nextValue,
+      }))
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    window.sessionStorage.setItem(
+      'zuna-checkout-form',
+      JSON.stringify(formValues)
+    )
+  }, [formValues])
+
+  useEffect(() => {
+    if (!orderPlaced) {
+      return
+    }
+    const timer = window.setTimeout(() => {
+      setOrderPlaced(false)
+    }, 10000)
+    return () => window.clearTimeout(timer)
+  }, [orderPlaced])
 
   return (
     <div className="flex flex-col gap-8">
@@ -91,12 +149,7 @@ function Checkout() {
                     placeholder="Zuna"
                     className="mt-2"
                     value={formValues.firstName}
-                    onChange={(event) =>
-                      setFormValues((current) => ({
-                        ...current,
-                        firstName: event.target.value,
-                      }))
-                    }
+                    onChange={handleFieldChange('firstName')}
                   />
                 </div>
                 <div>
@@ -107,12 +160,7 @@ function Checkout() {
                     placeholder="Cakes"
                     className="mt-2"
                     value={formValues.lastName}
-                    onChange={(event) =>
-                      setFormValues((current) => ({
-                        ...current,
-                        lastName: event.target.value,
-                      }))
-                    }
+                    onChange={handleFieldChange('lastName')}
                   />
                 </div>
               </div>
@@ -126,12 +174,7 @@ function Checkout() {
                     placeholder="zunacakes@gmail.com"
                     className="mt-2"
                     value={formValues.email}
-                    onChange={(event) =>
-                      setFormValues((current) => ({
-                        ...current,
-                        email: event.target.value,
-                      }))
-                    }
+                    onChange={handleFieldChange('email')}
                   />
                 </div>
                 <div>
@@ -143,12 +186,7 @@ function Checkout() {
                     placeholder="+63 9xx xxx xxxx"
                     className="mt-2"
                     value={formValues.phone}
-                    onChange={(event) =>
-                      setFormValues((current) => ({
-                        ...current,
-                        phone: event.target.value,
-                      }))
-                    }
+                    onChange={handleFieldChange('phone')}
                   />
                 </div>
               </div>
@@ -165,12 +203,7 @@ function Checkout() {
                   placeholder="Street address"
                   className="mt-2"
                   value={formValues.address}
-                  onChange={(event) =>
-                    setFormValues((current) => ({
-                      ...current,
-                      address: event.target.value,
-                    }))
-                  }
+                  onChange={handleFieldChange('address')}
                 />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
@@ -182,12 +215,7 @@ function Checkout() {
                     placeholder="City"
                     className="mt-2"
                     value={formValues.city}
-                    onChange={(event) =>
-                      setFormValues((current) => ({
-                        ...current,
-                        city: event.target.value,
-                      }))
-                    }
+                    onChange={handleFieldChange('city')}
                   />
                 </div>
                 <div>
@@ -198,15 +226,21 @@ function Checkout() {
                     placeholder="8600"
                     className="mt-2"
                     value={formValues.postalCode}
-                    onChange={(event) =>
-                      setFormValues((current) => ({
-                        ...current,
-                        postalCode: event.target.value,
-                      }))
-                    }
+                    onChange={handleFieldChange('postalCode')}
                   />
                 </div>
               </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-foreground/80">
+                Product notes
+              </label>
+              <Input
+                placeholder="Preferred color, size, or special requests. Specify the product name."
+                className="mt-2"
+                value={formValues.productNotes}
+                onChange={handleFieldChange('productNotes')}
+              />
             </div>
             <div className="flex items-center gap-2 rounded-3xl border border-border bg-muted p-4 text-sm text-muted-foreground">
               <Truck className="h-4 w-4" />
@@ -234,7 +268,9 @@ function Checkout() {
             }
             setIsPlaceDialogOpen(true)
           }}
-          primaryActionDisabled={!hasSelection || !isFormComplete || orderPlaced}
+          primaryActionDisabled={
+            !hasSelection || !isFormComplete || orderPlaced
+          }
           secondaryActionLabel="Edit cart"
           secondaryActionTo="/cart"
         />
@@ -256,6 +292,10 @@ function Checkout() {
                 onClick={() => {
                   setOrderPlaced(true)
                   setFormValues(initialFormValues)
+                  clearSelected()
+                  if (typeof window !== 'undefined') {
+                    window.sessionStorage.removeItem('zuna-checkout-form')
+                  }
                   setIsPlaceDialogOpen(false)
                 }}
               >
