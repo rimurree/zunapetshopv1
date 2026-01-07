@@ -28,7 +28,10 @@ function RouteLoader({ children }: RouteLoaderProps) {
 
   if (isRouteLoading) {
     return (
-      <LoadingAnimation className="min-h-[40vh]" label="Loading page..." />
+      <LoadingAnimation
+        className="min-h-[40vh]"
+        label="Zuna is sleeping. Please Wait..."
+      />
     )
   }
 

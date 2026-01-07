@@ -38,16 +38,24 @@ function Products() {
     const queryChanged = previous.query !== query
     previousFilters.current = { category: activeCategory, query }
 
-    if (categoryChanged && !queryChanged) {
-      setIsLoading(false)
-      return
+    const shouldDelay = !(categoryChanged && !queryChanged)
+    const startTimer = window.setTimeout(() => {
+      setIsLoading(shouldDelay)
+    }, 0)
+
+    let endTimer: number | undefined
+    if (shouldDelay) {
+      endTimer = window.setTimeout(() => {
+        setIsLoading(false)
+      }, 1000)
     }
 
-    setIsLoading(true)
-    const timer = window.setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-    return () => window.clearTimeout(timer)
+    return () => {
+      window.clearTimeout(startTimer)
+      if (endTimer) {
+        window.clearTimeout(endTimer)
+      }
+    }
   }, [activeCategory, query])
 
   return (
