@@ -1,0 +1,272 @@
+import { useState } from 'react'
+import { BadgeCheck, Truck } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import OrderSummary from '@/components/OrderSummary'
+import { products } from '@/data/products'
+import { useCart } from '@/context/useCart'
+
+function Checkout() {
+  const { items, selectedIds, selectedSubtotal, selectedItemCount } = useCart()
+  const initialFormValues = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: '',
+  }
+  const [orderPlaced, setOrderPlaced] = useState(false)
+  const [isPlaceDialogOpen, setIsPlaceDialogOpen] = useState(false)
+  const [formValues, setFormValues] = useState(initialFormValues)
+  const cartItems = items
+    .map((item) => ({
+      ...item,
+      product: products.find((product) => product.id === item.productId),
+    }))
+    .filter((item) => item.product && selectedIds.includes(item.productId))
+
+  const hasSelection = selectedItemCount > 0
+  const isFormComplete = Object.values(formValues).every((value) => value.trim())
+  const shipping = hasSelection ? 120 : 0
+  const tax = hasSelection ? selectedSubtotal * 0.12 : 0
+  const total = selectedSubtotal + shipping + tax
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground/80">
+          Checkout
+        </p>
+        <h1 className="text-3xl font-semibold text-foreground">
+          Secure your essentials
+        </h1>
+      </div>
+      {orderPlaced ? (
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+          <span className="inline-flex items-center gap-2 font-semibold">
+            <BadgeCheck className="h-4 w-4" />
+            Order confirmed
+          </span>
+          <p className="mt-1 text-xs text-emerald-700">
+            Thanks for your order. We will send a confirmation to your email.
+          </p>
+        </div>
+      ) : null}
+
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <Card>
+          <CardContent className="space-y-6">
+            <div className="mt-5 rounded-3xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+              <span className="inline-flex items-center gap-2 font-semibold">
+                <BadgeCheck className="h-4 w-4" />
+                Secure checkout
+              </span>
+              <p className="mt-1 text-xs text-emerald-700">
+                Your information is protected. Payment integration is disabled
+                for demo.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-foreground">
+                Contact information
+              </h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-sm font-semibold text-foreground/80">
+                    First name
+                  </label>
+                  <Input
+                    placeholder="Zuna"
+                    className="mt-2"
+                    value={formValues.firstName}
+                    onChange={(event) =>
+                      setFormValues((current) => ({
+                        ...current,
+                        firstName: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold text-foreground/80">
+                    Last name
+                  </label>
+                  <Input
+                    placeholder="Cakes"
+                    className="mt-2"
+                    value={formValues.lastName}
+                    onChange={(event) =>
+                      setFormValues((current) => ({
+                        ...current,
+                        lastName: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-sm font-semibold text-foreground/80">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="zunacakes@gmail.com"
+                    className="mt-2"
+                    value={formValues.email}
+                    onChange={(event) =>
+                      setFormValues((current) => ({
+                        ...current,
+                        email: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold text-foreground/80">
+                    Phone
+                  </label>
+                  <Input
+                    type="tel"
+                    placeholder="+63 9xx xxx xxxx"
+                    className="mt-2"
+                    value={formValues.phone}
+                    onChange={(event) =>
+                      setFormValues((current) => ({
+                        ...current,
+                        phone: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-foreground">
+                Delivery details
+              </h2>
+              <div>
+                <label className="text-sm font-semibold text-foreground/80">
+                  Address
+                </label>
+                <Input
+                  placeholder="Street address"
+                  className="mt-2"
+                  value={formValues.address}
+                  onChange={(event) =>
+                    setFormValues((current) => ({
+                      ...current,
+                      address: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-sm font-semibold text-foreground/80">
+                    City
+                  </label>
+                  <Input
+                    placeholder="City"
+                    className="mt-2"
+                    value={formValues.city}
+                    onChange={(event) =>
+                      setFormValues((current) => ({
+                        ...current,
+                        city: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold text-foreground/80">
+                    Postal code
+                  </label>
+                  <Input
+                    placeholder="8600"
+                    className="mt-2"
+                    value={formValues.postalCode}
+                    onChange={(event) =>
+                      setFormValues((current) => ({
+                        ...current,
+                        postalCode: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 rounded-3xl border border-border bg-muted p-4 text-sm text-muted-foreground">
+              <Truck className="h-4 w-4" />
+              Delivery arrives in 2-3 business days once checkout is complete.
+            </div>
+          </CardContent>
+        </Card>
+        <OrderSummary
+          items={cartItems.map((item) => ({
+            id: item.productId,
+            name: item.product?.name ?? 'Item',
+            quantity: item.quantity,
+            total: (item.product?.price ?? 0) * item.quantity,
+          }))}
+          emptyMessage="No items selected for checkout. Return to your cart to choose items."
+          itemCount={selectedItemCount}
+          subtotal={selectedSubtotal}
+          shipping={shipping}
+          tax={tax}
+          total={total}
+          primaryActionLabel={orderPlaced ? 'Order placed' : 'Place order'}
+          onPrimaryAction={() => {
+            if (orderPlaced) {
+              return
+            }
+            setIsPlaceDialogOpen(true)
+          }}
+          primaryActionDisabled={!hasSelection || !isFormComplete || orderPlaced}
+          secondaryActionLabel="Edit cart"
+          secondaryActionTo="/cart"
+        />
+        <AlertDialog
+          open={isPlaceDialogOpen}
+          onOpenChange={setIsPlaceDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Place this order?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Please confirm you want to place this order. You can edit your
+                cart if you need to make changes.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  setOrderPlaced(true)
+                  setFormValues(initialFormValues)
+                  setIsPlaceDialogOpen(false)
+                }}
+              >
+                Yes, place order
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
+  )
+}
+
+export default Checkout
