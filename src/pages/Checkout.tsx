@@ -183,7 +183,7 @@ function Checkout() {
                   </label>
                   <Input
                     type="tel"
-                    placeholder="+63 9xx xxx xxxx"
+                    placeholder="+63 912 345 6789"
                     className="mt-2"
                     value={formValues.phone}
                     onChange={handleFieldChange('phone')}
