@@ -30,7 +30,7 @@ function ProductCard({ product }: { product: Product }) {
           </h3>
           <p className="text-sm text-muted-foreground">{product.description}</p>
         </div>
-        <div className="mt-auto">
+        <div className="mt-auto space-y-3">
           <RatingStars rating={product.rating} />
           <div className="flex items-center justify-between gap-2">
             <p className="whitespace-nowrap text-sm font-semibold text-foreground">
