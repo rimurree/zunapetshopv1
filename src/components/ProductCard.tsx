@@ -30,30 +30,32 @@ function ProductCard({ product }: { product: Product }) {
           </h3>
           <p className="text-sm text-muted-foreground">{product.description}</p>
         </div>
-        <RatingStars rating={product.rating} />
-        <div className="flex items-center justify-between gap-2">
-          <p className="whitespace-nowrap text-sm font-semibold text-foreground">
-            ₱ {product.price.toFixed(2)}
-          </p>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => addItem(product.id, 1)}
-              aria-label={`Add ${product.name} to cart`}
-            >
-              <ShoppingBag className="h-4 w-4" />
-              Add
-            </Button>
-            <Link
-              to={`/products/${product.id}`}
-              className={cn(
-                buttonVariants({ variant: 'ghost', size: 'sm' }),
-                'text-muted-foreground mr-0.5'
-              )}
-            >
-              Details
-            </Link>
+        <div className="mt-auto">
+          <RatingStars rating={product.rating} />
+          <div className="flex items-center justify-between gap-2">
+            <p className="whitespace-nowrap text-sm font-semibold text-foreground">
+              ₱ {product.price.toFixed(2)}
+            </p>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addItem(product.id, 1)}
+                aria-label={`Add ${product.name} to cart`}
+              >
+                <ShoppingBag className="h-4 w-4" />
+                Add
+              </Button>
+              <Link
+                to={`/products/${product.id}`}
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'text-muted-foreground mr-0.5'
+                )}
+              >
+                Details
+              </Link>
+            </div>
           </div>
         </div>
       </CardContent>
