@@ -89,7 +89,7 @@ function NavBar() {
             onClick={() =>
               setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
             }
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card/80 text-foreground shadow-sm transition hover:bg-muted/70 dark:border-foreground/30"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card/80 text-foreground shadow-sm transition hover:bg-muted/70 dark:border-foreground/30 cursor-pointer"
             aria-label={
               theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
             }
